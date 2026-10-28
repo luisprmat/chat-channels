@@ -8,10 +8,12 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Profile settings')] class extends Component {
+new #[Title('Profile settings')] class extends Component
+{
     use ProfileValidationRules;
 
     public string $name = '';
+
     public string $email = '';
 
     /**
@@ -42,7 +44,6 @@ new #[Title('Profile settings')] class extends Component {
 
         Flux::toast(variant: 'success', text: __('Profile updated.'));
     }
-
 }; ?>
 
 <section class="w-full">
@@ -56,7 +57,6 @@ new #[Title('Profile settings')] class extends Component {
 
             <div>
                 <flux:input wire:model="email" :label="__('Email')" type="email" required autocomplete="email" />
-
             </div>
 
             <div class="flex items-center gap-4">
@@ -65,10 +65,9 @@ new #[Title('Profile settings')] class extends Component {
                         {{ __('Save') }}
                     </flux:button>
                 </div>
-
             </div>
         </form>
 
-            <livewire:pages::settings.delete-user-form />
+        <livewire:pages::settings.delete-user-form />
     </x-pages::settings.layout>
 </section>
