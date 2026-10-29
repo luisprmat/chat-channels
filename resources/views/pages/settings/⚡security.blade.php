@@ -4,13 +4,13 @@ use App\Concerns\PasswordValidationRules;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 use Laravel\Fortify\Actions\DisableTwoFactorAuthentication;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
-use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Security settings')] class extends Component
+new class extends Component
 {
     use PasswordValidationRules;
 
@@ -48,6 +48,12 @@ new #[Title('Security settings')] class extends Component
         $this->reset('current_password', 'password', 'password_confirmation');
 
         Flux::toast(variant: 'success', text: __('Password updated.'));
+    }
+
+    public function render(): View
+    {
+        return $this->view()
+            ->title(__('Security settings'));
     }
 }; ?>
 

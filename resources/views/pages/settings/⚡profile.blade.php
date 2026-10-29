@@ -4,11 +4,11 @@ use App\Concerns\ProfileValidationRules;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\View\View;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new #[Title('Profile settings')] class extends Component
+new class extends Component
 {
     use ProfileValidationRules;
 
@@ -43,6 +43,12 @@ new #[Title('Profile settings')] class extends Component
         $user->save();
 
         Flux::toast(variant: 'success', text: __('Profile updated.'));
+    }
+
+    public function render(): View
+    {
+        return $this->view()
+            ->title(__('Profile settings'));
     }
 }; ?>
 
