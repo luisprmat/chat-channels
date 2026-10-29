@@ -5,7 +5,10 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -31,6 +34,8 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    protected $appends = ['avatar'];
+
     /**
      * Get the attributes that should be cast.
      *
@@ -54,5 +59,29 @@ class User extends Authenticatable
         return Str::length($initials) > 1
             ? Str::substr($initials, 0, 1).Str::substr($initials, -1)
             : $initials;
+    }
+
+    protected function avatar(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => 'https://www.gravatar.com/avatar/'.md5($this->email).'?s=250&d=retro'
+        );
+    }
+
+    /**
+     * The channels the user is subscribed to.
+     */
+    public function channels(): BelongsToMany
+    {
+        return $this->belongsToMany(Channel::class, 'subscriptions')
+            ->withTimestamps();
+    }
+
+    /**
+     * The messages sent by the user.
+     */
+    public function messages(): HasMany
+    {
+        return $this->hasMany(Message::class);
     }
 }
