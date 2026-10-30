@@ -19,7 +19,7 @@ class Message extends Model
     {
         return [
             'content' => Markdown::class,
-            'sent_at' => 'datetime',
+            'sent_at' => 'datetime:H:i',
         ];
     }
 
