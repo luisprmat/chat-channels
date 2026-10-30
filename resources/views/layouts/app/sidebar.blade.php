@@ -24,6 +24,14 @@
                 >
                     {{ __('Dashboard') }}
                 </flux:sidebar.item>
+                <flux:sidebar.item
+                    icon="chat-bubble-bottom-center-text"
+                    :href="route('home')"
+                    :current="request()->routeIs('workspace')"
+                    wire:navigate
+                >
+                    {{ __('Chats') }}
+                </flux:sidebar.item>
             </flux:sidebar.group>
         </flux:sidebar.nav>
 

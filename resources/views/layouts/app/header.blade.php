@@ -18,6 +18,14 @@
             >
                 {{ __('Dashboard') }}
             </flux:navbar.item>
+            <flux:navbar.item
+                icon="chat-bubble-bottom-center-text"
+                :href="route('home')"
+                :current="request()->routeIs('workspace')"
+                wire:navigate
+            >
+                {{ __('Chats') }}
+            </flux:navbar.item>
         </flux:navbar>
 
         <flux:spacer />

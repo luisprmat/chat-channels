@@ -64,11 +64,40 @@
                     </li>
                 </ul>
 
-                <form action="{{ route("logout") }}" method="post" class="mb-2">
-                    @csrf
-                    @method('delete')
+                <div
+                    x-data="{
+                        open: false,
+                        toggle() {
+                            if (this.open) {
+                                return this.close();
+                            }
 
-                    <button type="submit" class="relative">
+                            this.$refs.button.focus();
+
+                            this.open = true;
+                        },
+                        close(focusAfter) {
+                            if (! this.open) return;
+
+                            this.open = false;
+
+                            focusAfter && focusAfter.focus();
+                        },
+                    }"
+                    x-on:keydown.escape.prevent.stop="close($refs.button)"
+                    x-on:focusin.window="! $refs.panel.contains($event.target) && close()"
+                    x-id="['dropdown-button']"
+                    class="relative flex flex-col gap-4"
+                >
+                    <!-- Trigger -->
+                    <button
+                        x-ref="button"
+                        x-on:click="toggle()"
+                        :aria-expanded="open"
+                        :aria-controls="$id('dropdown-button')"
+                        type="button"
+                        class="relative"
+                    >
                         <img
                             src="{{ Auth::user()->avatar }}"
                             alt="{{ Auth::user()->name }}"
@@ -81,7 +110,46 @@
                             </span>
                         </span>
                     </button>
-                </form>
+
+                    <!-- Panel -->
+                    <div
+                        x-ref="panel"
+                        x-show="open"
+                        x-transition.origin.bottom.left
+                        x-on:click.outside="close($refs.button)"
+                        :id="$id('dropdown-button')"
+                        x-cloak
+                        class="bg-sidebar absolute bottom-full left-0 z-10 mb-2 min-w-60 origin-bottom-left rounded-lg border border-gray-200 p-2 shadow-sm outline-none"
+                    >
+                        <div class="flex items-center gap-2 border-b p-2">
+                            <img
+                                src="{{ Auth::user()->avatar }}"
+                                alt="{{ Auth::user()->name }}"
+                                class="size-10 rounded-md"
+                            />
+
+                            <div class="flex flex-col overflow-x-auto scrollbar-thin scrollbar-thumb-sidebar">
+                                <div class="font-bold">{{ Auth::user()->name }}</div>
+                                <div class="text-sm text-slate-600">{{ Auth::user()->email }}</div>
+                            </div>
+                        </div>
+
+                        <form action="{{ route("logout") }}" method="post" class="mt-2">
+                            @csrf
+
+                            <button
+                                type="submit"
+                                class="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-gray-800 transition-colors hover:bg-fuchsia-900 hover:text-white focus-visible:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 lg:py-1.5"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                                </svg>
+
+                                <span>{{ __('Log out') }}</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
 
             <!-- Workspace -->
