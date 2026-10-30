@@ -3,6 +3,7 @@
 use App\Models\Channel;
 use App\Models\User;
 use Illuminate\View\View;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 new class extends Component
@@ -15,12 +16,34 @@ new class extends Component
 
     public $subscribers;
 
+    #[Validate]
+    public string $name = '';
+
     public function mount(Channel $channel): void
     {
         $this->channels = Channel::all();
         $this->channel = $channel;
         $this->users = User::orderBy('name')->get();
         $this->subscribers = $this->channel->getSubscribers();
+    }
+
+    public function createChannel(): void
+    {
+        $this->validate();
+
+        Channel::create(['name' => $this->name]);
+
+        $this->reset('name');
+        $this->channels = Channel::all();
+
+        $this->dispatch('channel-created');
+    }
+
+    protected function rules(): array
+    {
+        return [
+            'name' => ['required', 'lowercase', 'alpha_dash:ascii'],
+        ];
     }
 
     public function render(): View
@@ -34,8 +57,8 @@ new class extends Component
 
 <div class="flex h-[calc(100vh-40px)] w-full rounded-lg bg-fuchsia-800">
     <!-- Channels -->
-    <div class="bg-sidebar shrink-0 overflow-y-scroll rounded-l-lg">
-        <div class="flex h-14 items-center gap-x-32 border-b p-4">
+    <div class="bg-sidebar w-72 shrink-0 overflow-y-scroll rounded-l-lg">
+        <div class="flex h-14 items-center justify-between border-b p-4">
             <h1 class="text-xl font-bold">Laravel</h1>
 
             <x-icons.pencil class="size-6 text-gray-500" />
@@ -56,16 +79,51 @@ new class extends Component
                 </li>
             </ul>
 
-            <ul class="flex flex-col gap-y-2" x-data="{ open: true }">
-                <li>
-                    <button
-                        @click="open = ! open"
-                        class="flex w-full items-center gap-x-2 rounded-md px-4 py-1 hover:bg-white/30"
-                    >
-                        <x-icons.chevron-down class="size-3 text-gray-700" />
+            <ul
+                class="flex flex-col gap-y-2"
+                x-data="{ open: true, openChannelForm: false }"
+                x-on:channel-created.window="openChannelForm = false"
+            >
+                <li class="flex flex-col">
+                    <div class="flex">
+                        <button
+                            x-on:click="open = ! open"
+                            class="flex items-center gap-x-2 rounded-md px-4 py-1 hover:bg-white/30"
+                        >
+                            <x-icons.chevron-down class="size-3 text-gray-700" />
+                        </button>
 
-                        {{ __('Channels') }}
-                    </button>
+                        <button class="flex w-full items-center justify-between">
+                            <span>{{ __('Channels') }}</span>
+
+                            <x-icons.plus
+                                x-show="! openChannelForm"
+                                class="size-5 text-gray-700"
+                                x-on:click="
+                                    openChannelForm = true;
+                                    $nextTick(() => $refs.channelName.focus());
+                                "
+                            />
+
+                            <x-icons.minus
+                                x-show="openChannelForm"
+                                class="size-5 text-gray-700"
+                                x-on:click="openChannelForm = ! openChannelForm"
+                            />
+                        </button>
+                    </div>
+
+                    <input
+                        x-show="openChannelForm"
+                        x-ref="channelName"
+                        wire:model.live.blur="name"
+                        class="w-full rounded-md border border-gray-300 px-3 py-1"
+                        placeholder="general"
+                        wire:keydown.enter="createChannel"
+                    />
+                    @error('name')
+                        <p x-show="openChannelForm" class="text-sm text-fuchsia-700">{{ $message }}</p>
+                    @enderror
                 </li>
 
                 <li>
@@ -74,7 +132,10 @@ new class extends Component
                             <li>
                                 <a
                                     href="{{ route("workspace", $sidebar) }}"
-                                    class="{{ $channel->name === $sidebar->name ? "bg-fuchsia-900 text-white" : "" }} flex items-center gap-x-2 rounded-md px-4 py-1 hover:bg-fuchsia-900 hover:text-white"
+                                    @class([
+                                        'bg-fuchsia-900 text-white' => $channel->name === $sidebar->name,
+                                        'flex items-center gap-x-2 rounded-md px-4 py-1 hover:bg-fuchsia-900 hover:text-white',
+                                    ])
                                     wire:navigate
                                 >
                                     <x-icons.hashtag class="size-4 text-inherit" />
@@ -90,7 +151,7 @@ new class extends Component
             <ul class="flex flex-col gap-y-2" x-data="{ open: true }">
                 <li>
                     <button
-                        @click="open = ! open"
+                        x-on:click="open = ! open"
                         class="flex w-full items-center gap-x-2 rounded-md px-4 py-1 hover:bg-white/30"
                     >
                         <x-icons.chevron-down class="size-3 text-gray-700" />
