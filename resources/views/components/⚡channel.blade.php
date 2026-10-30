@@ -38,9 +38,7 @@ new class extends Component
             'mt-auto w-full py-4 text-center text-lg',
             'mb-4 border-b' => count($messages) > 0,
         ])>
-            This is the very beginning of the
-            <strong>{{ $channel->name }}</strong>
-            channel.
+            {!! __('This is the very beginning of the :channel channel.', ['channel' => '<strong>'.e($channel->name).'</strong>']) !!}
         </span>
 
         <template x-for="message in $wire.messages">
@@ -73,7 +71,7 @@ new class extends Component
                 <span class="text-lg font-bold"> #{{ $channel->name }} </span>
 
                 <button type="submit" class="rounded-md bg-green-800 px-4 py-2 text-base text-white" wire:click="join">
-                    Join channel
+                    {{ __('Join channel') }}
                 </button>
             </div>
         @endif

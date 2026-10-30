@@ -41,7 +41,7 @@
                 <input
                     type="search"
                     class="w-full rounded-sm bg-white/20 px-3 py-1 text-sm placeholder:text-white"
-                    placeholder="Search Laravel"
+                    placeholder="{{ __('Search :name', ['name' => 'Laravel']) }}"
                 />
             </div>
 
@@ -56,7 +56,7 @@
             <div class="flex flex-col justify-between py-2 pr-5 pl-3.5">
                 <ul class="flex flex-col gap-y-4">
                     <li>
-                        <img src="{{ asset("images/laravel.png") }}" alt="Avatar" class="size-10 rounded-md" />
+                        <img src="{{ asset("images/laravel.png") }}" alt="{{ __('Avatar') }}" class="size-10 rounded-md" />
                     </li>
 
                     <li class="flex size-10 items-center justify-center rounded-md bg-white/20 text-white">

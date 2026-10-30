@@ -46,13 +46,13 @@ new class extends Component
                 <li class="flex items-center gap-x-2 rounded-md px-4 py-1">
                     <x-icons.message class="size-6 text-gray-700" />
 
-                    Threads
+                    {{ __('Threads') }}
                 </li>
 
                 <li class="flex items-center gap-x-2 rounded-md px-4 py-1">
                     <x-icons.airplane class="size-6 text-gray-700" />
 
-                    Drafts & sent
+                    {{ __('Drafts & sent') }}
                 </li>
             </ul>
 
@@ -64,7 +64,7 @@ new class extends Component
                     >
                         <x-icons.chevron-down class="size-3 text-gray-700" />
 
-                        Channels
+                        {{ __('Channels') }}
                     </button>
                 </li>
 
@@ -95,7 +95,7 @@ new class extends Component
                     >
                         <x-icons.chevron-down class="size-3 text-gray-700" />
 
-                        Direct messages
+                        {{ __('Direct messages') }}
                     </button>
                 </li>
 

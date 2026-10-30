@@ -19,7 +19,7 @@
         type="text"
         class="h-12 w-full resize-none border-none p-3 text-gray-700 focus:outline-hidden"
         name="message"
-        placeholder="Message #{{ $channel }}"
+        placeholder="{{ __('Message #:channel', ['channel' => $channel]) }}"
         autofocus
         @keydown.enter="submit"
         @keyup="$dispatch('typing')"
