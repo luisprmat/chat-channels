@@ -21,7 +21,7 @@ new class extends Component
 
     public function mount(Channel $channel): void
     {
-        $this->channels = Channel::all();
+        $this->channels = Channel::all()->toArray();
         $this->channel = $channel;
         $this->users = User::orderBy('name')->get();
         $this->subscribers = $this->channel->getSubscribers();
@@ -34,7 +34,7 @@ new class extends Component
         Channel::create(['name' => $this->name]);
 
         $this->reset('name');
-        $this->channels = Channel::all();
+        $this->channels = Channel::all()->toArray();
 
         $this->dispatch('channel-created');
     }
@@ -79,11 +79,7 @@ new class extends Component
                 </li>
             </ul>
 
-            <ul
-                class="flex flex-col gap-y-2"
-                x-data="{ open: true, openChannelForm: false }"
-                x-on:channel-created.window="openChannelForm = false"
-            >
+            <ul class="flex flex-col gap-y-2" x-data="channels" x-on:channel-created.window="openChannelForm = false">
                 <li class="flex flex-col">
                     <div class="flex">
                         <button
@@ -128,22 +124,20 @@ new class extends Component
 
                 <li>
                     <ul x-cloak x-show="open">
-                        @foreach ($channels as $sidebar)
+                        <template x-for="channel in $wire.channels">
                             <li>
                                 <a
-                                    href="{{ route("workspace", $sidebar) }}"
-                                    @class([
-                                        'bg-fuchsia-900 text-white' => $channel->name === $sidebar->name,
-                                        'flex items-center gap-x-2 rounded-md px-4 py-1 hover:bg-fuchsia-900 hover:text-white',
-                                    ])
+                                    :href="`/${channel.name}`"
+                                    class="flex items-center gap-x-2 rounded-md px-4 py-1 hover:bg-fuchsia-900 hover:text-white"
+                                    :class="{'bg-fuchsia-900 text-white': channel.name === @js($channel->name)}"
                                     wire:navigate
                                 >
                                     <x-icons.hashtag class="size-4 text-inherit" />
 
-                                    {{ $sidebar->name }}
+                                    <span x-text="channel.name"></span>
                                 </a>
                             </li>
-                        @endforeach
+                        </template>
                     </ul>
                 </li>
             </ul>
@@ -190,3 +184,15 @@ new class extends Component
         <livewire:channel :channel="$channel" />
     </div>
 </div>
+
+@script
+    <script>
+        Alpine.data('channels', () => {
+            return {
+                open: true,
+
+                openChannelForm: false,
+            };
+        });
+    </script>
+@endscript
