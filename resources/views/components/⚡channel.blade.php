@@ -34,28 +34,30 @@ new class extends Component
 
 <div x-data="channel" class="flex h-[calc(100vh-100px)] w-full flex-col justify-between p-4 pb-2">
     <div class="messages mb-4 flex h-full grow flex-col overflow-y-scroll" x-ref="messages">
-        <span @class([
-            'mt-auto w-full py-4 text-center text-lg',
-            'mb-4 border-b' => count($messages) > 0,
-        ])>
-            {!! __('This is the very beginning of the :channel channel.', ['channel' => '<strong>'.e($channel->name).'</strong>']) !!}
-        </span>
+        @if ($subscribed)
+            <span @class([
+                'mt-auto w-full py-4 text-center text-lg',
+                'mb-4 border-b' => count($messages) > 0,
+            ])>
+                {!! __('This is the very beginning of the :channel channel.', ['channel' => '<strong>'.e($channel->name).'</strong>']) !!}
+            </span>
 
-        <template x-for="message in $wire.messages">
-            <div class="flex gap-x-2">
-                <img :src="message.user.avatar" :alt="message.user.name" class="size-10 rounded-md" />
+            <template x-for="message in $wire.messages">
+                <div class="flex gap-x-2">
+                    <img :src="message.user.avatar" :alt="message.user.name" class="size-10 rounded-md" />
 
-                <div>
-                    <div class="flex items-center gap-x-2">
-                        <span class="text-lg font-bold" x-text="message.user.name"></span>
+                    <div>
+                        <div class="flex items-center gap-x-2">
+                            <span class="text-lg font-bold" x-text="message.user.name"></span>
 
-                        <time class="text-sm text-gray-600" x-text="message.sent_at"></time>
+                            <time class="text-sm text-gray-600" x-text="message.sent_at"></time>
+                        </div>
+
+                        <div x-html="message.content" class="text-lg"></div>
                     </div>
-
-                    <div x-html="message.content" class="text-lg"></div>
                 </div>
-            </div>
-        </template>
+            </template>
+        @endif
     </div>
 
     <div class="flex w-full" @submitted.stop="send($event.detail.message)">
@@ -90,9 +92,9 @@ new class extends Component
 
                 init() {
                     this.scrollPosition();
-                    this.channel = Echo.channel('channels.{{ $channel->id }}');
+                    this.channel = Echo.private('channels.{{ $channel->id }}');
                     this.channel.listen('MessageSent', (event) => {
-                        this.$wire.messages.push(event.message)
+                        this.$wire.messages.push(event.message);
                     });
                 },
 
