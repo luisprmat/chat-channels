@@ -60,13 +60,13 @@ new class extends Component
         @endif
     </div>
 
-    <div class="flex w-full" x-on:submitted.stop="send($event.detail.message)">
+    <div class="flex w-full" x-on:submitted.stop="send($event.detail.message)" x-on:typing="typing">
         @if ($subscribed)
             <div class="flex w-full flex-col gap-y-1">
                 <x-editor channel="{{ $channel->name }}" />
 
                 <!-- Typing Indicator -->
-                <span class="block shrink-0 text-xs text-gray-500 after:content-['\200b']"></span>
+                <span class="block shrink-0 text-xs text-gray-500 after:content-['\200b']" x-text="typingUsers"></span>
             </div>
         @else
             <div class="flex grow flex-col items-center justify-center gap-y-4 rounded-md border bg-gray-100 p-6">
@@ -96,10 +96,46 @@ new class extends Component
                     this.channel.listen('MessageSent', (event) => {
                         this.$wire.messages.push(event.message);
                     });
+                    this.channel.listenForWhisper('StartTyping', (event) => {
+                        this.usersTyping.push(event);
+                    });
+                    this.channel.listenForWhisper('StopTyping', (event) => {
+                        this.usersTyping = this.usersTyping.filter((user) => user.id !== event.id);
+                    });
                 },
 
                 send(message) {
                     this.$wire.send(message);
+                },
+
+                typing() {
+                    this.debounce(
+                        () => {
+                            this.channel.whisper('StartTyping', {
+                                id: @js(auth()->id()),
+                                name: @js(auth()->user()->name),
+                            });
+                        },
+                        () => {
+                            this.channel.whisper('StopTyping', {
+                                id: @js(auth()->id()),
+                                name: @js(auth()->user()->name),
+                            });
+                        },
+                    );
+                },
+
+                typingUsers() {
+                    switch (this.usersTyping.length) {
+                        case 0:
+                            return '';
+                        case 1:
+                            return `${this.usersTyping[0].name} is typing...`;
+                        case 2:
+                            return `${this.usersTyping[0].name} and ${this.usersTyping[1].name} are typing...`;
+                        default:
+                            return 'Several people are typing...';
+                    }
                 },
 
                 scrollPosition() {

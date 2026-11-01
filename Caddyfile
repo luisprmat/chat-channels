@@ -18,6 +18,9 @@ chat-channels.test:8443 {
     resource_identifier https://chat-channels.test:8443/.well-known/mercure
     cors_origins        {$APP_URL}
 
+    # Required to client's events (whisper)
+    publish_origins {$APP_URL}
+
     # Expose the subscriptions API, which Echo uses to synthesize presence channels
 	subscriptions
   }
