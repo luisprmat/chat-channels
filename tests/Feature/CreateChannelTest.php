@@ -22,7 +22,7 @@ test('a channel can be created', function () {
         ->assertHasNoErrors()
         ->assertSet('name', '')
         ->assertDispatched('channel-created')
-        ->assertSee('random');
+        ->assertSet('channels', fn (array $channels) => collect($channels)->contains('name', 'random'));
 
     expect(Channel::where('name', 'random')->exists())->toBeTrue();
 });
