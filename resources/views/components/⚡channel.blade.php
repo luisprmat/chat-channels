@@ -78,28 +78,34 @@ new class extends Component
     </div>
 </div>
 
-<script>
-    Alpine.data('channel', () => {
-        return {
-            isTyping: false,
+@script
+    <script>
+        Alpine.data('channel', () => {
+            return {
+                isTyping: false,
 
-            usersTyping: [],
+                usersTyping: [],
 
-            channel: null,
+                channel: null,
 
-            init() {
-                this.scrollPosition();
-            },
+                init() {
+                    this.scrollPosition();
+                    this.channel = Echo.channel('channels.{{ $channel->id }}');
+                    this.channel.listen('MessageSent', (event) => {
+                        this.$wire.messages.push(event.message)
+                    });
+                },
 
-            send(message) {
-                this.$wire.send(message);
-            },
+                send(message) {
+                    this.$wire.send(message);
+                },
 
-            scrollPosition() {
-                this.$watch('$wire.messages', () => {
-                    this.$refs.messages.scrollTop = this.$refs.messages.scrollHeight;
-                });
-            },
-        };
-    });
-</script>
+                scrollPosition() {
+                    this.$watch('$wire.messages', () => {
+                        this.$refs.messages.scrollTop = this.$refs.messages.scrollHeight;
+                    });
+                },
+            };
+        });
+    </script>
+@endscript

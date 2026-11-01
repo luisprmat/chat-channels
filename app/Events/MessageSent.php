@@ -3,10 +3,13 @@
 namespace App\Events;
 
 use App\Models\Message;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class MessageSent
+class MessageSent implements ShouldBroadcast, ShouldQueue
 {
     use Dispatchable, SerializesModels;
 
@@ -16,5 +19,15 @@ class MessageSent
     public function __construct(public Message $message)
     {
         $message->load('user');
+    }
+
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return Channel|Channel[]|string[]|string
+     */
+    public function broadcastOn(): Channel
+    {
+        return new Channel('channels.'.$this->message->channel_id);
     }
 }
