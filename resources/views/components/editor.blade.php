@@ -21,12 +21,12 @@
         name="message"
         placeholder="{{ __('Message #:channel', ['channel' => $channel]) }}"
         autofocus
-        @keydown.enter="submit"
-        @keyup="$dispatch('typing')"
+        x-on:keydown.enter="submit"
+        x-on:keyup="$dispatch('typing')"
     />
 
     <div class="flex justify-end p-2">
-        <button @click="submit()">
+        <button x-on:click="submit()">
             <x-icons.airplane class="size-6 text-gray-400" />
         </button>
     </div>
