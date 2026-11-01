@@ -3,15 +3,24 @@
 }
 
 # The domain name of your server
-localhost:8000 {
+# Server must be started as `frankenphp run --envfile .env` to load `APP_URL` and `MERCURE_JWT_SECRET` when is needed
+{$APP_URL} {
 	# Set the webroot to the public/ directory
 	root public/
 	# Enable compression (optional)
 	encode zstd br gzip
 
-    mercure {
-		publisher_jwt {env.MERCURE_JWT_SECRET}
-		subscriber_jwt {env.MERCURE_JWT_SECRET}
+	mercure {
+		# Must match the "iss" claim of the tokens signed by Laravel (APP_URL)
+		issuer {$APP_URL} {
+			publisher {
+				jwt {env.MERCURE_JWT_SECRET} HS256
+			}
+			subscriber {
+				jwt {env.MERCURE_JWT_SECRET} HS256
+			}
+		}
+		publish_origins {$APP_URL}
 		anonymous
 	}
 
