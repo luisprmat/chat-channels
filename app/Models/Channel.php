@@ -76,6 +76,6 @@ class Channel extends Model
             'sent_at' => now(),
         ]);
 
-        MessageSent::dispatch($message);
+        broadcast(new MessageSent($message))->toOthers();
     }
 }
