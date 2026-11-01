@@ -99,6 +99,7 @@ new class extends Component
                                     openChannelForm = true;
                                     $nextTick(() => $refs.channelName.focus());
                                 "
+                                data-test="add-channel"
                             />
 
                             <x-icons.minus
@@ -116,6 +117,7 @@ new class extends Component
                         class="w-full rounded-md border border-gray-300 px-3 py-1"
                         placeholder="general"
                         wire:keydown.enter="createChannel"
+                        data-test="new-channel-input"
                     />
                     @error('name')
                         <p x-show="openChannelForm" class="text-sm text-fuchsia-700">{{ $message }}</p>
