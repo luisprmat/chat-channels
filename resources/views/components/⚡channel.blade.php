@@ -60,7 +60,7 @@ new class extends Component
         @endif
     </div>
 
-    <div class="flex w-full" @submitted.stop="send($event.detail.message)">
+    <div class="flex w-full" x-on:submitted.stop="send($event.detail.message)">
         @if ($subscribed)
             <div class="flex w-full flex-col gap-y-1">
                 <x-editor channel="{{ $channel->name }}" />
@@ -106,6 +106,26 @@ new class extends Component
                     this.$watch('$wire.messages', () => {
                         this.$refs.messages.scrollTop = this.$refs.messages.scrollHeight;
                     });
+                },
+
+                debouncer: null,
+
+                debounce(startCallback, stopCallback) {
+                    if (this.debouncer) {
+                        clearTimeout(this.debouncer);
+                    }
+
+                    this.debouncer = setTimeout(() => {
+                        this.isTyping = false;
+
+                        stopCallback();
+                    }, 2000);
+
+                    if (!this.isTyping) {
+                        this.isTyping = true;
+
+                        startCallback();
+                    }
                 },
             };
         });
