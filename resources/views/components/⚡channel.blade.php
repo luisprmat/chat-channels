@@ -130,11 +130,13 @@ new class extends Component
                         case 0:
                             return '';
                         case 1:
-                            return `${this.usersTyping[0].name} is typing...`;
+                            return @js(__(':name is typing...')).replace(':name', this.usersTyping[0].name);
                         case 2:
-                            return `${this.usersTyping[0].name} and ${this.usersTyping[1].name} are typing...`;
+                            return @js(__(':first and :second are typing...'))
+                                .replace(':first', this.usersTyping[0].name)
+                                .replace(':second', this.usersTyping[1].name);
                         default:
-                            return 'Several people are typing...';
+                            return @js(__('Several people are typing...'));
                     }
                 },
 
