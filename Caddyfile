@@ -2,7 +2,7 @@
   auto_https disable_redirects
 }
 
-chat-channels.test:8443 {
+{$APP_URL}:8443 {
   tls internal
 
   # Start mercure hub with: `mercure run --envfile .env`
@@ -15,7 +15,7 @@ chat-channels.test:8443 {
         jwt {env.MERCURE_JWT_SECRET}
       }
     }
-    resource_identifier https://chat-channels.test:8443/.well-known/mercure
+    resource_identifier {$APP_URL}:8443/.well-known/mercure
     cors_origins        {$APP_URL}
 
     # Required to client's events (whisper)

@@ -9,7 +9,13 @@
 
                     <span class="absolute -right-1 -bottom-1">
                         <span class="bg-sidebar flex size-3.5 items-center justify-center rounded-full">
-                            <span class="bg-sidebar flex size-2 rounded-full border border-gray-400"></span>
+                            <span
+                                class="flex h-2 w-2 rounded-full border"
+                                :class="{
+                                    'bg-green-600 border-green-600': user.online,
+                                    'bg-sidebar border-gray-400': ! user.online,
+                                }"
+                            ></span>
                         </span>
                     </span>
                 </span>
@@ -25,7 +31,12 @@
         Alpine.data('users', () => {
             return {
                 users: @js($users),
-                init() {},
+                init() {
+                    Echo.join('workspace')
+                        .here((users) => this.markOnline(users))
+                        .joining((user) => this.markOnline([user]))
+                        .leaving((user) => this.markOffline([user]));
+                },
                 markOnline(users) {
                     users.forEach((user) => {
                         this.users.find((u) => u.id === user.id).online = true;
