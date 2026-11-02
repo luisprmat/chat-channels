@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use App\Events\MessageSent;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Broadcast;
 
 #[Unguarded]
 class Channel extends Model
@@ -76,6 +76,10 @@ class Channel extends Model
             'sent_at' => now(),
         ]);
 
-        broadcast(new MessageSent($message))->toOthers();
+        Broadcast::private('channels.'.$this->id)
+            ->as('App\\Events\\MessageSent')
+            ->with(['message' => $message->load('user')])
+            ->toOthers()
+            ->send();
     }
 }
