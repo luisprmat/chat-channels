@@ -42,7 +42,7 @@ new class extends Component
     protected function rules(): array
     {
         return [
-            'name' => ['required', 'lowercase', 'alpha_dash:ascii'],
+            'name' => ['required', 'lowercase', 'alpha_dash:ascii', 'unique:channels'],
         ];
     }
 
@@ -114,7 +114,7 @@ new class extends Component
                         x-show="openChannelForm"
                         x-ref="channelName"
                         wire:model.live.blur="name"
-                        class="w-full rounded-md border border-gray-300 px-3 py-1"
+                        class="w-full rounded-md border border-gray-300 bg-white px-3 py-1"
                         placeholder="general"
                         wire:keydown.enter="createChannel"
                         data-test="new-channel-input"
@@ -194,6 +194,12 @@ new class extends Component
                 open: true,
 
                 openChannelForm: false,
+
+                init() {
+                    Echo.join('workspace').listen('.ChannelCreated', (event) => {
+                        this.$wire.channels.push(event.model);
+                    });
+                },
             };
         });
     </script>
