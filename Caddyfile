@@ -22,6 +22,8 @@
 		}
 		publish_origins {$APP_URL}
 		anonymous
+		# Expose the subscriptions API, which Echo uses to synthesize presence channels
+		subscriptions
 	}
 
 	# Execute PHP files from the public/ directory and serve assets
