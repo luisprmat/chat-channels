@@ -2,7 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Broadcasting\Channel as BroadcastingChannel;
+use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
+use Illuminate\Database\Eloquent\BroadcastableModelEventOccurred;
+use Illuminate\Database\Eloquent\BroadcastsEvents;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -12,6 +16,8 @@ use Illuminate\Support\Facades\Broadcast;
 #[Unguarded]
 class Channel extends Model
 {
+    use BroadcastsEvents;
+
     /**
      * The users subscribed to the channel.
      */
@@ -81,5 +87,28 @@ class Channel extends Model
             ->with(['message' => $message->load('user')])
             ->toOthers()
             ->send();
+    }
+
+    /**
+     * Get the channels that model events should broadcast on.
+     *
+     * @return array<int, BroadcastingChannel|Model>
+     */
+    public function broadcastOn(string $event): BroadcastingChannel|array
+    {
+        return match ($event) {
+            'created' => new PresenceChannel('workspace'),
+            default => [],
+        };
+    }
+
+    /**
+     * Create a new broadcastable model event for the model.
+     */
+    protected function newBroadcastableEvent(string $event): BroadcastableModelEventOccurred
+    {
+        return (new BroadcastableModelEventOccurred(
+            $this, $event
+        ))->dontBroadcastToCurrentUser();
     }
 }
