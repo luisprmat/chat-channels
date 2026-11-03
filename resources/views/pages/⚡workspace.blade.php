@@ -55,7 +55,7 @@ new class extends Component
 };
 ?>
 
-<div class="flex h-[calc(100vh-40px)] w-full rounded-lg bg-fuchsia-800">
+<div class="flex h-[calc(100vh-40px)] w-full rounded-lg bg-fuchsia-800" data-workspace>
     <!-- Channels -->
     <div class="bg-sidebar w-72 shrink-0 overflow-y-scroll rounded-l-lg">
         <div class="flex h-14 items-center justify-between border-b p-4">
@@ -79,7 +79,12 @@ new class extends Component
                 </li>
             </ul>
 
-            <ul class="flex flex-col gap-y-2" x-data="channels" x-on:channel-created.window="openChannelForm = false">
+            <ul
+                class="flex flex-col gap-y-2"
+                x-data="channels"
+                x-on:channel-created.window="openChannelForm = false"
+                x-on:workspace-channel-created.window="$wire.channels.push($event.detail)"
+            >
                 <li class="flex flex-col">
                     <div class="flex">
                         <button
@@ -196,9 +201,7 @@ new class extends Component
                 openChannelForm: false,
 
                 init() {
-                    Echo.join('workspace').listen('.ChannelCreated', (event) => {
-                        this.$wire.channels.push(event.model);
-                    });
+                    this.$store.workspace.join();
                 },
             };
         });
