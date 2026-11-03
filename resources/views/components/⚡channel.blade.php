@@ -92,6 +92,19 @@ new class extends Component
 
                 init() {
                     this.scrollPosition();
+
+                    if (this.$wire.subscribed) {
+                        this.listen();
+                    }
+
+                    this.$watch('$wire.subscribed', (subscribed) => subscribed && this.listen());
+                },
+
+                listen() {
+                    if (this.channel) {
+                        return;
+                    }
+
                     this.channel = Echo.private('channels.{{ $channel->id }}');
                     this.channel.listen('MessageSent', (event) => {
                         this.$wire.messages.push(event.message);
@@ -102,6 +115,12 @@ new class extends Component
                     this.channel.listenForWhisper('StopTyping', (event) => {
                         this.usersTyping = this.usersTyping.filter((user) => user.id !== event.id);
                     });
+                },
+
+                destroy() {
+                    if (this.channel) {
+                        Echo.leave('channels.{{ $channel->id }}');
+                    }
                 },
 
                 send(message) {
@@ -141,9 +160,12 @@ new class extends Component
                 },
 
                 scrollPosition() {
-                    this.$watch('$wire.messages', () => {
-                        this.$refs.messages.scrollTop = this.$refs.messages.scrollHeight;
-                    });
+                    this.$nextTick(() => this.scrollToBottom());
+                    this.$watch('$wire.messages', () => this.scrollToBottom());
+                },
+
+                scrollToBottom() {
+                    this.$refs.messages.scrollTop = this.$refs.messages.scrollHeight;
                 },
 
                 debouncer: null,

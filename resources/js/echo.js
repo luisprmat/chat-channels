@@ -6,15 +6,23 @@ window.Echo = new Echo({
 });
 
 /**
- * Pages kept in the back/forward cache keep their connection open, which leaves
- * the user in presence channels after navigating away or logging out. Close the
- * connection when the page is hidden and reload if the page is restored from
- * that cache, since disconnecting makes the Mercure connector forget its channels.
+ * Pages kept in the back/forward cache keep their Mercure streams open, which
+ * leaves the user in presence channels after navigating away or logging out.
+ * Close the connection when the page is hidden. Disconnecting forgets the joined
+ * channels, so a page that had any is reloaded if restored from that cache, which
+ * joins them again and also picks up the current session and messages.
  */
-window.addEventListener("pagehide", () => window.Echo.disconnect());
+let hadChannelsWhenHidden = false;
+
+window.addEventListener("pagehide", () => {
+    hadChannelsWhenHidden =
+        Object.keys(window.Echo.connector.channels).length > 0;
+
+    window.Echo.disconnect();
+});
 
 window.addEventListener("pageshow", (event) => {
-    if (event.persisted) {
+    if (event.persisted && hadChannelsWhenHidden) {
         window.location.reload();
     }
 });
