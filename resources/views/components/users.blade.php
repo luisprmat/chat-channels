@@ -12,8 +12,8 @@
                             <span
                                 class="flex h-2 w-2 rounded-full border"
                                 :class="{
-                                    'bg-green-600 border-green-600': user.online,
-                                    'bg-sidebar border-gray-400': ! user.online,
+                                    'bg-green-600 border-green-600': $store.workspace.isOnline(user),
+                                    'bg-sidebar border-gray-400': ! $store.workspace.isOnline(user),
                                 }"
                             ></span>
                         </span>
@@ -32,20 +32,7 @@
             return {
                 users: @js($users),
                 init() {
-                    Echo.join('workspace')
-                        .here((users) => this.markOnline(users))
-                        .joining((user) => this.markOnline([user]))
-                        .leaving((user) => this.markOffline([user]));
-                },
-                markOnline(users) {
-                    users.forEach((user) => {
-                        this.users.find((u) => u.id === user.id).online = true;
-                    });
-                },
-                markOffline(users) {
-                    users.forEach((user) => {
-                        this.users.find((u) => u.id === user.id).online = false;
-                    });
+                    this.$store.workspace.join();
                 },
             };
         });

@@ -6,15 +6,17 @@ window.Echo = new Echo({
 });
 
 /**
- * Pages kept in the back/forward cache keep their connection open, which leaves
+ * Pages kept in the back/forward cache keep their WebSocket open, which leaves
  * the user in presence channels after navigating away or logging out. Close the
- * connection when the page is hidden and reload if the page is restored from
- * that cache, since disconnecting makes the Mercure connector forget its channels.
+ * connection when the page is hidden and reconnect (pusher-js re-subscribes
+ * every channel) if the page is restored from that cache.
  */
-window.addEventListener("pagehide", () => window.Echo.disconnect());
+window.addEventListener("pagehide", () =>
+    window.Echo.connector.pusher.disconnect(),
+);
 
 window.addEventListener("pageshow", (event) => {
     if (event.persisted) {
-        window.location.reload();
+        window.Echo.connector.pusher.connect();
     }
 });
