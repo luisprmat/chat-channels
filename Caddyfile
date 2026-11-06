@@ -1,0 +1,26 @@
+{
+  auto_https disable_redirects
+}
+
+chat-channels.test:8443 {
+  tls internal
+
+  # Start mercure hub with: `mercure run --envfile .env`
+  mercure {
+    issuer {$APP_URL} {
+      publisher {
+        jwt {env.MERCURE_JWT_SECRET}
+      }
+      subscriber {
+        jwt {env.MERCURE_JWT_SECRET}
+      }
+    }
+    resource_identifier https://chat-channels.test:8443/.well-known/mercure
+    cors_origins        {$APP_URL}
+
+    # Expose the subscriptions API, which Echo uses to synthesize presence channels
+	subscriptions
+  }
+
+  respond "Not Found" 404
+}
